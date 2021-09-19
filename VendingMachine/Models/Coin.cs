@@ -8,8 +8,12 @@ namespace VendingMachine.Models
     {
         [Key]
         public int Id { get; set; }
+
         public int Denomination { get; set; }
+
+        [Range(1, int.MaxValue, ErrorMessage = "Недопустимое количество")]
         public int Count { get; set; }
+
         public bool Availability { get; set; }
     }
 }

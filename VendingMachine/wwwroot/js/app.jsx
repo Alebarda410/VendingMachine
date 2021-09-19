@@ -24,34 +24,41 @@
 class DrinksList extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { drinks: [] };
         this.onSelectDrink = this.onSelectDrink.bind(this);
-        this.filterList = this.filterList.bind(this);
-        this.drinksList = [];
-    }
-    // фильтрация списка
-    filterList(e) {
-        console.log(drinksList);
-        var filteredList = this.drinksList.filter(function (item) {
-            return item.price >= this.props.checkSum;
-        });
-        // обновление состояния
-        this.setState({ drinks: filteredList });
-    }
-    // загружаем данные
-    loadData() {
-        var xhr = new XMLHttpRequest();
-        xhr.open("get", this.props.apiUrl, true);
-        xhr.onload = function () {
-            this.drinksList = JSON.parse(xhr.responseText);
-        }.bind(this);
-        xhr.send();
-    }
-    componentDidMount() {
-        this.loadData();
     }
     onSelectDrink(drink) {
-        console.log(drink);
+        if (drink) {
+            var xhr = new XMLHttpRequest();
+            drink.count--;
+            xhr.open("put", "/api/drinks", true);
+            xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+            xhr.onload = function () {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    xhr.open("put", "/api/coins/inc", true);
+                    xhr.setRequestHeader("Content-Type","application/json");
+                    xhr.onload = function () {
+                        if (xhr.status ===200) {
+                            xhr.open("put", `/api/coins/dec/${this.props.sum - drink.price}`, true);
+                            xhr.onload = function () {
+                                if (xhr.status >= 200 && xhr.status < 300) {
+                                    var str = "Ваша сдача: ";
+                                    var data = JSON.parse(xhr.responseText);
+                                    for (var item in data) {
+                                        str += (data[item] + " раз по " + item + "р, ");
+                                    }
+                                    str += "спасибо за покупку!";
+                                    alert(str);
+                                    document.location.href = "/";
+                                }
+                            }.bind(this);
+                            xhr.send();
+                        }
+                    }.bind(this);
+                    xhr.send(JSON.stringify(this.props.coins));
+                }
+            }.bind(this);
+            xhr.send(JSON.stringify(drink));
+        }
     }
     render() {
         var select = this.onSelectDrink;
@@ -59,12 +66,8 @@ class DrinksList extends React.Component {
             <p className="h2">Доступные напитки</p>
             <div className="row">
                 {
-                    this.state.drinks.map(function (drink) {
-                        if (drink.availability === true && drink.count > 0) {
-                            return <Drink key={drink.id} drink={drink} onSelect={select}/>;
-                        } else {
-                            return null;
-                        }
+                    this.props.drinks.map(function (drink) {
+                        return <Drink key={drink.id} drink={drink} onSelect={select}/>;
                     })
                 }
             </div>
@@ -79,10 +82,10 @@ class Coin extends React.Component {
         this.onClick = this.onClick.bind(this);
     }
     onClick(e) {
-        this.props.onClickCoin(this.state.coin.denomination);
+        this.props.onClickCoin(this.state.coin);
     }
     render() {
-        if (this.state.coin.availability === true && this.state.coin.count>0) {
+        if (this.state.coin.availability === true && this.state.coin.count > 0) {
             return (<button onClick={this.onClick} className="btn btn-primary btn-lg">{this.state.coin.denomination}р</button>);
         } else {
             return (<button disabled className="btn btn-primary btn-lg">{this.state.coin.denomination}р</button>);
@@ -92,27 +95,54 @@ class Coin extends React.Component {
 class CoinsList extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { coins: [], sum:0 };
+        this.state = { coins: [], sum: 0, coinsClicked: {} };
         this.onClickCoin = this.onClickCoin.bind(this);
+        this.drinksList = [];
+        this.coinsClickedList = {};
     }
-    loadData() {
+    loadCoins() {
         var xhr = new XMLHttpRequest();
         xhr.open("get", this.props.apiUrl, true);
         xhr.onload = function () {
             var data = JSON.parse(xhr.responseText);
             this.setState({ coins: data });
+            this.loadDrinks();
+        }.bind(this);
+        xhr.send();
+    }
+    loadDrinks() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("get", "api/drinks", true);
+        xhr.onload = function () {
+            this.drinksList = JSON.parse(xhr.responseText);
         }.bind(this);
         xhr.send();
     }
     componentDidMount() {
-        this.loadData();
+        this.loadCoins();
     }
-    onClickCoin(denomination) {
-        this.setState(state => ({
-            sum: state.sum + denomination,
-        }));
-        this.props.updateSum(this.state.sum);
+    onClickCoin(coin) {
+        this.setState(state => ({ sum: state.sum + coin.denomination }), function () {
+            if (isNaN(this.coinsClickedList[coin.denomination])) {
+                this.coinsClickedList[coin.denomination] = 1;
+            } else {
+                this.coinsClickedList[coin.denomination] += 1;
+            }
+            this.setState({ coinsClicked: this.coinsClickedList }, function() {
+                this.filterList();
+            });
+            
+        });
+        
     }
+    // фильтрация списка
+    filterList() {
+        var filteredList = this.drinksList.filter( item => 
+            item.price <= this.state.sum
+        );
+        this.props.updateStates(filteredList, this.state.sum, this.state.coinsClicked);
+    }
+    
     render() {
         var click = this.onClickCoin;
         return (<div>
@@ -132,17 +162,20 @@ class CoinsList extends React.Component {
 class App extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { sum : 0};
-        this.updateSum = this.updateSum.bind(this);
+        this.state = { drinks: [], sum: 0, coins: {} };
+        this.updateStates = this.updateStates.bind(this);
     }
-    updateSum(value) {
-        this.setState({sum : value });
+    updateStates(value1,value2,value3) {
+        this.setState({ drinks : value1 });
+        this.setState({ sum: value2 });
+        this.setState({ coins: value3 });
     }
     render() {
-        var update = this.updateSum;
+        var update = this.updateStates;
+
         return (<div>
-            <CoinsList updateSum={update} apiUrl="/api/coins" />
-            <DrinksList checkSum={this.state.sum} apiUrl="/api/drinks" />
+            <CoinsList updateStates={update} apiUrl="/api/coins" />
+            <DrinksList coins={this.state.coins} drinks={this.state.drinks} sum={this.state.sum}/>
         </div>);
     }
 }
