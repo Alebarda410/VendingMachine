@@ -18,7 +18,7 @@ namespace VendingMachine.Models
         [Range(1, int.MaxValue, ErrorMessage = "Недопустимая цена")]
         public int Price { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "Недопустимое количество")]
+        [Range(0, int.MaxValue, ErrorMessage = "Недопустимое количество")]
         public int Count { get; set; }
 
         public bool Availability { get; set; }

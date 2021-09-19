@@ -4,12 +4,12 @@
         this.state = { drink: this.props.drink };
         this.onClick = this.onClick.bind(this);
     }
-    onClick(e) {
+    onClick(e) { 
         this.props.onSelect(this.state.drink);
     }
     render() {
         return (
-            <div className="col-lg-4 col-md-6 col-sm-12 p-2">
+            <div className="col-lg-3 col-md-4 col-sm-12 p-2">
                 <div className="card h-100" onClick={this.onClick}>
                     <img className="card-img-top" src={this.state.drink.logo} alt={this.state.drink.name} />
                     <div className="card-body">
@@ -32,6 +32,7 @@ class DrinksList extends React.Component {
             drink.count--;
             xhr.open("put", "/api/drinks", true);
             xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+            console.log(drink);
             xhr.onload = function () {
                 if (xhr.status >= 200 && xhr.status < 300) {
                     xhr.open("put", "/api/coins/inc", true);
@@ -42,7 +43,7 @@ class DrinksList extends React.Component {
                             xhr.onload = function () {
                                 if (xhr.status >= 200 && xhr.status < 300) {
                                     var str = "Ваша сдача: ";
-                                    var data = JSON.parse(xhr.responseText);
+                                    var data = JSON.parse(xhr.response);
                                     for (var item in data) {
                                         str += (data[item] + " раз по " + item + "р, ");
                                     }
@@ -63,11 +64,47 @@ class DrinksList extends React.Component {
     render() {
         var select = this.onSelectDrink;
         return (<div>
-            <p className="h2">Доступные напитки</p>
+            <p className="h2">Доступные напитки  - {this.props.drinks.length}</p>
             <div className="row">
                 {
                     this.props.drinks.map(function (drink) {
                         return <Drink key={drink.id} drink={drink} onSelect={select}/>;
+                    })
+                }
+            </div>
+        </div>);
+    }
+}
+
+class SimpleDrink extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+    render() {
+        return (
+            <div className="col-lg-3 col-md-4 col-sm-12 p-2">
+                <div className="card h-100">
+                    <img className="card-img-top" src={this.props.drink.logo} alt={this.props.drink.name} />
+                    <div className="card-body">
+                        <h5 className="card-title">{this.props.drink.name}</h5>
+                        <p className="card-text">Цена {this.props.drink.price} руб.</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+}
+class SimpleDrinksList extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+    render() {
+        return (<div>
+            <p className="h2">Все напитки - {this.props.drinks.length}</p>
+            <div className="row">
+                {
+                    this.props.drinks.map(function (drink) {
+                        return <SimpleDrink key={drink.id} drink={drink}/>;
                     })
                 }
             </div>
@@ -104,7 +141,7 @@ class CoinsList extends React.Component {
         var xhr = new XMLHttpRequest();
         xhr.open("get", this.props.apiUrl, true);
         xhr.onload = function () {
-            var data = JSON.parse(xhr.responseText);
+            var data = JSON.parse(xhr.response);
             this.setState({ coins: data });
             this.loadDrinks();
         }.bind(this);
@@ -114,7 +151,7 @@ class CoinsList extends React.Component {
         var xhr = new XMLHttpRequest();
         xhr.open("get", "api/drinks", true);
         xhr.onload = function () {
-            this.drinksList = JSON.parse(xhr.responseText);
+            this.drinksList = JSON.parse(xhr.response);
         }.bind(this);
         xhr.send();
     }
@@ -162,7 +199,7 @@ class CoinsList extends React.Component {
 class App extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { drinks: [], sum: 0, coins: {} };
+        this.state = { drinks: [], allDrinks: [], sum: 0, coins: {} };
         this.updateStates = this.updateStates.bind(this);
     }
     updateStates(value1,value2,value3) {
@@ -170,12 +207,25 @@ class App extends React.Component {
         this.setState({ sum: value2 });
         this.setState({ coins: value3 });
     }
+    loadDrinks() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("get", "api/drinks", true);
+        xhr.onload = function () {
+            var data = JSON.parse(xhr.response);
+            this.setState({ allDrinks : data });
+        }.bind(this);
+        xhr.send();
+    }
+    componentDidMount() {
+        this.loadDrinks();
+    }
     render() {
         var update = this.updateStates;
 
         return (<div>
             <CoinsList updateStates={update} apiUrl="/api/coins" />
             <DrinksList coins={this.state.coins} drinks={this.state.drinks} sum={this.state.sum}/>
+            <SimpleDrinksList drinks={this.state.allDrinks}/>
         </div>);
     }
 }

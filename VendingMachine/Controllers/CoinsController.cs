@@ -41,7 +41,6 @@ namespace VendingMachine.Controllers
         // выдем сдачу
         public IActionResult DecCoins([FromRoute] int change)
         {
-            // 10 5 2 1
             var dic = new Dictionary<int, int>();
 
             Change(dic, change);
@@ -79,6 +78,14 @@ namespace VendingMachine.Controllers
                 curCoins[key] -= count;
                 dic[key] += count;
                 money -= count * key;
+            }
+
+            foreach (var key in dic.Keys)
+            {
+                if (dic[key] == 0)
+                {
+                    dic.Remove(key);
+                }
             }
         }
 
