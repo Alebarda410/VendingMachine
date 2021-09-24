@@ -23,18 +23,14 @@ namespace VendingMachine.Controllers
         private readonly IWebHostEnvironment _appEnvironment;
         private readonly DataBaseContext _db;
 
-        [HttpGet]
-        // список напитков которые можно купить
-        public IEnumerable<Drink> Get()
+        [HttpGet("{type}")]
+        // список напитков
+        public IEnumerable<Drink> GetDrinks(string type)
         {
-            return _db.Drinks.Where(drink => drink.Count > 0 && drink.Availability);
-        }
-
-        [HttpGet("{id:int}")]
-        // список всех напитков
-        public IEnumerable<Drink> AllGet(int id)
-        {
-            return id == 3 ? _db.Drinks : null;
+            // разный вывод в зависимости от запроса
+            return type.Equals("all") ?
+                _db.Drinks :
+                _db.Drinks.Where(drink => drink.Count > 0 && drink.Availability);
         }
 
         [HttpDelete("{id:int}")]
@@ -46,12 +42,11 @@ namespace VendingMachine.Controllers
             {
                 return BadRequest();
             }
-            // доп проверка из-за того что может быть удаление пользователя
+            // доп проверка из-за того что может быть удаление
             // без обновления изображения
             if (drink.Logo.Contains('.'))
             {
                 System.IO.File.Delete(_appEnvironment.WebRootPath + drink.Logo);
-
             }
             _db.Drinks.Remove(drink);
             _db.SaveChanges();
@@ -60,7 +55,7 @@ namespace VendingMachine.Controllers
 
         [HttpPut("{id:int}")]
         // отдельная загрузка файла
-        public ActionResult<string> EditLogo(int id, IFormFile file)
+        public IActionResult EditLogo(int id, IFormFile file)
         {
             if (file == null)
             {
@@ -92,7 +87,7 @@ namespace VendingMachine.Controllers
 
         [HttpPut]
         // обновить состояние напитка
-        public ActionResult<Drink> EditDrink(Drink drink)
+        public IActionResult EditDrink(Drink drink)
         {
             _db.Entry(drink).State = EntityState.Modified;
             _db.SaveChanges();
@@ -101,7 +96,7 @@ namespace VendingMachine.Controllers
 
         [HttpPost]
         // добавить напиток
-        public ActionResult<Drink> AddDrink(Drink drink)
+        public IActionResult AddDrink(Drink drink)
         {
             _db.Drinks.Add(drink);
             _db.SaveChanges();

@@ -156,7 +156,7 @@ class DrinksList extends React.Component {
     }
     loadDrinks() {
         var xhr = new XMLHttpRequest();
-        xhr.open("get", "api/drinks/3", true);
+        xhr.open("get", "api/drinks/all", true);
         xhr.onload = function () {
             var data = JSON.parse(xhr.response);
             this.setState({ drinks: data });

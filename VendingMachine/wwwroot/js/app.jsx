@@ -32,7 +32,6 @@ class DrinksList extends React.Component {
             drink.count--;
             xhr.open("put", "/api/drinks", true);
             xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
-            console.log(drink);
             xhr.onload = function () {
                 if (xhr.status >= 200 && xhr.status < 300) {
                     xhr.open("put", "/api/coins/inc", true);
@@ -139,7 +138,7 @@ class CoinsList extends React.Component {
     }
     loadCoins() {
         var xhr = new XMLHttpRequest();
-        xhr.open("get", this.props.apiUrl, true);
+        xhr.open("get", "/api/coins", true);
         xhr.onload = function () {
             var data = JSON.parse(xhr.response);
             this.setState({ coins: data });
@@ -149,7 +148,7 @@ class CoinsList extends React.Component {
     }
     loadDrinks() {
         var xhr = new XMLHttpRequest();
-        xhr.open("get", "api/drinks", true);
+        xhr.open("get", "api/drinks/notall", true);
         xhr.onload = function () {
             this.drinksList = JSON.parse(xhr.response);
         }.bind(this);
@@ -209,7 +208,7 @@ class App extends React.Component {
     }
     loadDrinks() {
         var xhr = new XMLHttpRequest();
-        xhr.open("get", "api/drinks", true);
+        xhr.open("get", "api/drinks/notall", true);
         xhr.onload = function () {
             var data = JSON.parse(xhr.response);
             this.setState({ allDrinks : data });
@@ -223,7 +222,7 @@ class App extends React.Component {
         var update = this.updateStates;
 
         return (<div>
-            <CoinsList updateStates={update} apiUrl="/api/coins" />
+            <CoinsList updateStates={update} />
             <DrinksList coins={this.state.coins} drinks={this.state.drinks} sum={this.state.sum}/>
             <SimpleDrinksList drinks={this.state.allDrinks}/>
         </div>);

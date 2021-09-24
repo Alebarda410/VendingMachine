@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using VendingMachine.Models;
 
 namespace VendingMachine.Controllers
@@ -26,7 +26,7 @@ namespace VendingMachine.Controllers
 
         [HttpPut]
         // изменение администратором
-        public IActionResult PutCoin(Coin coin)
+        public IActionResult UpdateCoin(Coin coin)
         {
             if (coin == null)
             {
@@ -39,7 +39,7 @@ namespace VendingMachine.Controllers
 
         [HttpPut("dec/{change:int}")]
         // выдем сдачу
-        public IActionResult DecCoins([FromRoute] int change)
+        public IActionResult DecCoins(int change)
         {
             var dic = new Dictionary<int, int>();
 
@@ -52,16 +52,16 @@ namespace VendingMachine.Controllers
             _db.SaveChanges();
             return Ok(JsonConvert.SerializeObject(dic));
         }
-        
+
         // генерация сдачи
-        private void Change(IDictionary<int, int> dic, int money)
+        private void Change(Dictionary<int, int> coinBack, int money)
         {
             var curCoins = new Dictionary<int, int>();
             foreach (var coin in _db.Coins)
             {
                 if (coin.Count <= 0) continue;
                 curCoins[coin.Denomination] = coin.Count;
-                dic[coin.Denomination] = 0;
+                coinBack[coin.Denomination] = 0;
             }
 
             var sortCurCoins = curCoins.OrderByDescending(pair => pair.Key);
@@ -76,16 +76,13 @@ namespace VendingMachine.Controllers
                 if (count <= 0) continue;
 
                 curCoins[key] -= count;
-                dic[key] += count;
+                coinBack[key] += count;
                 money -= count * key;
             }
 
-            foreach (var key in dic.Keys)
+            foreach (var key in coinBack.Keys.Where(key => coinBack[key] == 0))
             {
-                if (dic[key] == 0)
-                {
-                    dic.Remove(key);
-                }
+                coinBack.Remove(key);
             }
         }
 
@@ -103,7 +100,10 @@ namespace VendingMachine.Controllers
 
             foreach (var coin in editCoins)
             {
-                coin.Count += dic[coin.Denomination];
+                if (dic != null)
+                {
+                    coin.Count += dic[coin.Denomination];
+                }
             }
 
             _db.SaveChanges();
