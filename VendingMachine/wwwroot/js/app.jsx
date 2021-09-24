@@ -133,7 +133,6 @@ class CoinsList extends React.Component {
         super(props);
         this.state = { coins: [], sum: 0, coinsClicked: {} };
         this.onClickCoin = this.onClickCoin.bind(this);
-        this.drinksList = [];
         this.coinsClickedList = {};
     }
     loadCoins() {
@@ -142,15 +141,6 @@ class CoinsList extends React.Component {
         xhr.onload = function () {
             var data = JSON.parse(xhr.response);
             this.setState({ coins: data });
-            this.loadDrinks();
-        }.bind(this);
-        xhr.send();
-    }
-    loadDrinks() {
-        var xhr = new XMLHttpRequest();
-        xhr.open("get", "api/drinks/notall", true);
-        xhr.onload = function () {
-            this.drinksList = JSON.parse(xhr.response);
         }.bind(this);
         xhr.send();
     }
@@ -173,7 +163,8 @@ class CoinsList extends React.Component {
     }
     // фильтрация списка
     filterList() {
-        var filteredList = this.drinksList.filter( item => 
+        console.log(this.props.drinksList);
+        var filteredList = this.props.drinksList.filter( item =>
             item.price <= this.state.sum
         );
         this.props.updateStates(filteredList, this.state.sum, this.state.coinsClicked);
@@ -222,7 +213,7 @@ class App extends React.Component {
         var update = this.updateStates;
 
         return (<div>
-            <CoinsList updateStates={update} />
+            <CoinsList drinksList={this.state.allDrinks} updateStates={update} />
             <DrinksList coins={this.state.coins} drinks={this.state.drinks} sum={this.state.sum}/>
             <SimpleDrinksList drinks={this.state.allDrinks}/>
         </div>);
