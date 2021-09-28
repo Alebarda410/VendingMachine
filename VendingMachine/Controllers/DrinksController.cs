@@ -46,7 +46,7 @@ namespace VendingMachine.Controllers
             // без обновления изображения
             if (drink.Logo.Contains('.'))
             {
-                System.IO.File.Delete(_appEnvironment.WebRootPath + drink.Logo);
+                System.IO.File.Delete($"{_appEnvironment.WebRootPath}{drink.Logo}");
             }
             _db.Drinks.Remove(drink);
             _db.SaveChanges();
@@ -75,11 +75,11 @@ namespace VendingMachine.Controllers
             {
                 return BadRequest();
             }
-            System.IO.File.Delete(_appEnvironment.WebRootPath + drink.Logo);
+            System.IO.File.Delete($"{_appEnvironment.WebRootPath}{drink.Logo}");
             var img = Image.Load(file.OpenReadStream());
             img.Mutate(x => x.Resize(300, 400));
             drink.Logo = $"/upload/{drink.Id}_logo.{file.FileName.Split('.').Last()}";
-            img.Save(_appEnvironment.WebRootPath + drink.Logo);
+            img.Save($"{_appEnvironment.WebRootPath}{drink.Logo}");
 
             _db.SaveChanges();
             return Ok(drink.Logo);

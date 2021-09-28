@@ -13,13 +13,13 @@
     }
     addError(errors) {
         errors.forEach(error => {
-            var p = document.createElement("p");
+            let p = document.createElement("p");
             p.append(error);
             document.getElementById(`errors${this.state.drink.id}`).append(p);
         });
     }
     onDelete() {
-        var xhr = new XMLHttpRequest();
+        let xhr = new XMLHttpRequest();
         xhr.open("delete", `api/drinks/${this.state.drink.id}`, true);
         xhr.onload = function () {
             if (xhr.status >= 200 && xhr.status < 300) {
@@ -30,22 +30,22 @@
     }
 
     onSave() {
-        var tempDrink = {};
+        let tempDrink = {};
         tempDrink.id = this.state.drink.id;
         tempDrink.name = this.nameInput.current.value;
         tempDrink.logo = this.state.drink.logo;//меняется отдельным запросом
         tempDrink.price = this.priceInput.current.value;
         tempDrink.count = this.countInput.current.value;
         tempDrink.availability = this.checkBox.current.checked;
-        
-        var xhr = new XMLHttpRequest();
+
+        let xhr = new XMLHttpRequest();
         xhr.open("put", "api/drinks", true);
         xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
         xhr.onload = function () {
             if (xhr.status >= 200 && xhr.status < 300) {
                 document.getElementById(`errors${this.state.drink.id}`).classList.add("d-none");
                 if (this.fileInput.current.files.length > 0) {
-                    var data = new FormData();
+                    let data = new FormData();
                     data.append("file", this.fileInput.current.files[0]);
                     xhr.open("put", `api/drinks/${this.state.drink.id}`, true);
                     xhr.onload = function() {
@@ -62,9 +62,9 @@
                     xhr.send(data);
                 }
             } else {
-                var errorData = JSON.parse(xhr.response);
+                let errorData = JSON.parse(xhr.response);
                 if (errorData) {
-                    // ошибки вследствие валидации по атрибутам
+                    // ошибки валидации по атрибутам
                     if (errorData.errors) {
                         if (errorData.errors["Name"]) {
                             this.addError(errorData.errors["Name"]);
@@ -114,8 +114,7 @@
                             </li>
                             <li className="list-group-item">
                                 <div className="form-check">
-                                    <input
-                                        ref={this.checkBox}
+                                    <input ref={this.checkBox}
                                         className="form-check-input"
                                         type="checkbox"
                                         defaultChecked={this.state.drink.availability}
@@ -155,10 +154,10 @@ class DrinksList extends React.Component {
         this.loadDrinks();
     }
     loadDrinks() {
-        var xhr = new XMLHttpRequest();
+        let xhr = new XMLHttpRequest();
         xhr.open("get", "api/drinks/all", true);
         xhr.onload = function () {
-            var data = JSON.parse(xhr.response);
+            let data = JSON.parse(xhr.response);
             this.setState({ drinks: data });
         }.bind(this);
         xhr.send();
@@ -171,34 +170,34 @@ class DrinksList extends React.Component {
         this.checkBox.current.checked = false;
     }
     onClick() {
-        var temp = {};
+        let temp = {};
         temp.name = this.nameInput.current.value;
         temp.logo = "file";
         temp.price = this.priceInput.current.value;
         temp.count = this.countInput.current.value;
         temp.availability = this.checkBox.current.checked;
 
-        var xhr = new XMLHttpRequest();
+        let xhr = new XMLHttpRequest();
         xhr.open("post", "api/drinks", true);
         xhr.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
         xhr.onload = function () {
             if (xhr.status >= 200 && xhr.status < 300) {
                 document.getElementById("errorsForm").classList.add("d-none");
-                var data = new FormData();
+                let data = new FormData();
                 data.append("file", this.fileInput.current.files[0]);
-                var dataResponse = JSON.parse(xhr.response);
+                let dataResponse = JSON.parse(xhr.response);
                 temp.id = dataResponse.id;
                 xhr.open("put", `api/drinks/${dataResponse.id}`, true);
                 xhr.onload = function() {
                     if (xhr.status >= 200 && xhr.status < 300) {
                         document.getElementById("errorsForm").classList.add("d-none");
                         temp.logo = xhr.response;
-                        var tempDeinksList = this.state.drinks;
-                        tempDeinksList.push(temp);
-                        this.setState({drink:tempDeinksList});
+                        let tempDrinksList = this.state.drinks;
+                        tempDrinksList.push(temp);
+                        this.setState({drink:tempDrinksList});
                         this.clearForm();
                     } else {
-                        var p = document.createElement("p");
+                        let p = document.createElement("p");
                         p.append(xhr.response);
                         document.getElementById("errorsForm").append(p);
                         document.getElementById("errorsForm").classList.remove("d-none");
@@ -209,7 +208,7 @@ class DrinksList extends React.Component {
                 }.bind(this);
                 xhr.send(data);
             } else {
-                var errorData = JSON.parse(xhr.response);
+                let errorData = JSON.parse(xhr.response);
                 if (errorData) {
                     // ошибки вследствие валидации по атрибутам
                     if (errorData.errors) {
@@ -298,8 +297,8 @@ class Coin extends React.Component {
         this.state = { coin: this.props.coin };
     }
     onClick(){
-        var xhr = new XMLHttpRequest();
-        var tempCoin = this.state.coin;
+        let xhr = new XMLHttpRequest();
+        let tempCoin = this.state.coin;
         tempCoin.count = this.countInput.current.value;
         tempCoin.availability = this.checkBox.current.checked;
         xhr.open("put", "api/coins", true);
@@ -337,10 +336,10 @@ class CoinsList extends React.Component {
         this.state = { coins: [] };
     }
     loadCoins() {
-        var xhr = new XMLHttpRequest();
+        let xhr = new XMLHttpRequest();
         xhr.open("get", "api/coins", true);
         xhr.onload = function () {
-            var data = JSON.parse(xhr.response);
+            let data = JSON.parse(xhr.response);
             this.setState({ coins: data });
         }.bind(this);
         xhr.send();
@@ -371,11 +370,11 @@ class App extends React.Component {
         this.load();
     }
     load() {
-        var res = prompt("Введите код доступа", "");
+        let res = prompt("Введите код доступа", "");
         if (res === "" || res === null) {
             document.location.href = "/";
         }
-        var xhr = new XMLHttpRequest();
+        let xhr = new XMLHttpRequest();
         xhr.open("get", `api/users/${res}`, true);
         xhr.onload = function () {
             if (xhr.status >= 200 && xhr.status < 300) {
