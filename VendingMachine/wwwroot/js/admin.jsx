@@ -94,31 +94,28 @@
                 <div className="col-lg-3 col-md-4 col-sm-12 p-2">
                     <div className="card h-100">
                         <img className="card-img-top" src={this.state.logo} alt={this.state.drink.name} />
-                        <div id={`errors${this.state.drink.id}`} className="alert alert-danger p-1 m-0 d-none"></div>
+                        <div id={`errors${this.state.drink.id}`} className="alert alert-danger p-1 m-0 d-none"/>
                         <ul className="list-group list-group-flush">
                             <li className="list-group-item">
                                 <label className="form-label">Название</label>
-                                <input ref={this.nameInput} className="form-control" type="text" defaultValue={this.state.drink.name}></input>
+                                <input ref={this.nameInput} className="form-control" type="text" defaultValue={this.state.drink.name}/>
                             </li>
                             <li className="list-group-item">
                                 <label className="form-label">Цена</label>
-                                <input ref={this.priceInput} className="form-control" type="text" defaultValue={this.state.drink.price}></input>
+                                <input ref={this.priceInput} className="form-control" type="text" defaultValue={this.state.drink.price}/>
                             </li>
                             <li className="list-group-item">
                                 <label htmlFor={`file${this.state.drink.id}`} className="form-label">Изображение</label>
-                                <input ref={this.fileInput} className="form-control" type="file" id={`file${this.state.drink.id}`}></input>
+                                <input ref={this.fileInput} className="form-control" type="file" id={`file${this.state.drink.id}`}/>
                             </li>
                             <li className="list-group-item">
                                 <label className="form-label">Количество</label>
-                                <input ref={this.countInput} className="form-control" type="text" defaultValue={this.state.drink.count}></input>
+                                <input ref={this.countInput} className="form-control" type="text" defaultValue={this.state.drink.count}/>
                             </li>
                             <li className="list-group-item">
                                 <div className="form-check">
-                                    <input ref={this.checkBox}
-                                        className="form-check-input"
-                                        type="checkbox"
-                                        defaultChecked={this.state.drink.availability}
-                                        id={`check${this.state.drink.id}`}></input>
+                                    <input ref={this.checkBox} className="form-check-input" type="checkbox"
+                                        defaultChecked={this.state.drink.availability} id={`check${this.state.drink.id}`}/>
                                     <label className="form-check-label" htmlFor={`check${this.state.drink.id}`}>
                                         Доступность
                                     </label>
@@ -134,7 +131,7 @@
             );
         } else {
 
-            return (<div className="d-none"></div>);
+            return (<div className="d-none"/>);
         }
     }
 }
@@ -240,36 +237,30 @@ class DrinksList extends React.Component {
             <div className="row">
                 <div className="col-lg-3 col-md-4 col-sm-12 p-2">
                     <div className="card h-100">
-                        <img className="card-img-top" src="upload/deflogo.png" alt="deflogo.png" />
-                        <div id="errorsForm" className="alert alert-danger p-1 m-0 d-none"></div>
+                        <img className="card-img-top" src="upload/deflogo.png" alt="deflogo.png"/>
+                        <div id="errorsForm" className="alert alert-danger p-1 m-0 d-none"/>
                         <ul className="list-group list-group-flush">
                             <li className="list-group-item">
                                 <label className="form-label">Название</label>
-                                <input ref={this.nameInput} className="form-control" type="text" defaultValue=""></input>
+                                <input ref={this.nameInput} className="form-control" type="text" defaultValue=""/>
                             </li>
                             <li className="list-group-item">
                                 <label className="form-label">Цена</label>
-                                <input ref={this.priceInput} className="form-control" type="text" defaultValue="0"></input>
+                                <input ref={this.priceInput} className="form-control" type="text" defaultValue="0"/>
                             </li>
                             <li className="list-group-item">
                                 <label htmlFor="formFile" className="form-label">Изображение</label>
-                                <input ref={this.fileInput} className="form-control" type="file" id="formFile"></input>
+                                <input ref={this.fileInput} className="form-control" type="file" id="formFile"/>
                             </li>
                             <li className="list-group-item">
                                 <label className="form-label">Количество</label>
-                                <input ref={this.countInput} className="form-control" type="text" defaultValue="0"></input>
+                                <input ref={this.countInput} className="form-control" type="text" defaultValue="0"/>
                             </li>
                             <li className="list-group-item">
                                 <div className="form-check">
-                                    <input
-                                        ref={this.checkBox}
-                                        className="form-check-input"
-                                        type="checkbox"
-                                        defaultChecked={false}
-                                        id="check0" ></input>
-                                    <label className="form-check-label" htmlFor="check0">
-                                        Доступность
-                                    </label>
+                                    <input ref={this.checkBox} className="form-check-input" type="checkbox"
+                                        defaultChecked={false} id="check0"/>
+                                    <label className="form-check-label" htmlFor="check0">Доступность</label>
                                 </div>
                             </li>
                             <li className="list-group-item">
@@ -310,20 +301,13 @@ class Coin extends React.Component {
             <div className="row">
             <p className="h3 col-1">{this.state.coin.denomination}р </p>
             <div className="form-check col-2">
-                <input 
-                    ref={this.checkBox} 
-                    className="form-check-input"
-                    type="checkbox"
-                    defaultChecked={this.state.coin.availability}
-                    id={`coinCheck${this.state.coin.id}`}>
-                </input>
-                <label className="form-check-label" htmlFor={`coinCheck${this.state.coin.id}`}>
-                    Доступность
-                </label>
+                <input ref={this.checkBox} className="form-check-input" type="checkbox"
+                    defaultChecked={this.state.coin.availability} id={`coinCheck${this.state.coin.id}`}/>
+                <label className="form-check-label" htmlFor={`coinCheck${this.state.coin.id}`}>Доступность</label>
             </div>
             <div className="col-2">
                 <label className="form-label">Количество</label>
-                <input ref={this.countInput} className="form-control" type="text" defaultValue={this.state.coin.count}></input>
+                <input ref={this.countInput} className="form-control" type="text" defaultValue={this.state.coin.count}/>
             </div>
             <button onClick={this.onClick} type="button" className="btn btn-link col-1">Изменить</button>
             </div>
@@ -397,7 +381,7 @@ class App extends React.Component {
             );
         } else {
             return (
-                <div></div>
+                <div/>
             );
         }
         
